@@ -4,11 +4,12 @@ import akka.actor._
 import akka.util._
 
 
-//case object Tick
-//case object Get
+case class CommandEntry(line: ByteString)
 
 object Neptune {
   class Listener extends Actor {
+
+    val state = IO.IterateeRef.Map.async[IO.Handle]()(context.dispatcher)
 
     override def preStart {
       println("starting on port 6715")
@@ -16,8 +17,27 @@ object Neptune {
     }
 
     def receive = {
-      case IO.NewClient(socket) =>
-        println("aaaaaaaaaaaaaaaaahhhhhhhhhhhhhh")
+      case IO.NewClient(server) => {
+        val socket = server.accept()
+        state(socket).flatMap(_ => Listener.processLines(socket))
+      }
+      case IO.Read(socket, bytes) => state(socket)(IO.Chunk(bytes))
+      case IO.Closed(socket, cause) => {
+        state(socket)(IO.EOF)
+        state -= socket
+      }
+    }
+  }
+
+  object Listener {
+    val lineFeed = ByteString(0x0a) // linefeed
+
+    def processLines(socket: IO.SocketHandle): IO.Iteratee[Unit] = {
+      IO.repeat {
+        IO.takeUntil(lineFeed).map {
+          case line: ByteString => socket.write(ByteString("This will be parsed: ") ++ line ++ lineFeed)
+        }
+      }
     }
   }
 }
