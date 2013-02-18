@@ -19,6 +19,7 @@ object Neptune {
     def receive = {
       case IO.NewClient(server) => {
         val socket = server.accept()
+        socket write ByteString("> ")
         state(socket).flatMap(_ => Listener.processLines(socket))
       }
       case IO.Read(socket, bytes) => state(socket)(IO.Chunk(bytes))
@@ -32,10 +33,14 @@ object Neptune {
   object Listener {
     val lineFeed = ByteString(0x0a) // linefeed
 
+    // Parser entrypoint
     def processLines(socket: IO.SocketHandle): IO.Iteratee[Unit] = {
       IO.repeat {
         IO.takeUntil(lineFeed).map {
-          case line: ByteString => socket.write(ByteString("This will be parsed: ") ++ line ++ lineFeed)
+          case line: ByteString => {
+            val response = Parser.process(line)
+            socket.write(response ++ ByteString("> "))
+          }
         }
       }
     }
