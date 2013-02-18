@@ -1,36 +1,42 @@
 package org.jarsonmar
 
-import akka.actor._
-import akka.pattern.ask
-import akka.util.duration._
-import akka.util.Timeout
+import java.io._
 
-case object Tick
-case object Get
+import akka.actor.Actor
+import akka.actor.Props
+//import akka.pattern.ask
+//import akka.util.duration._
+//import akka.util.Timeout
+//
+//import akka.io.IO
+//import akka.io.Tcp._
 
-class Counter extends Actor {
-  var count = 0
 
-  def receive = {
-    case Tick => count += 1
-    case Get  => sender ! count
-  }
-}
+//case object Tick
+//case object Get
 
 object Neptune extends App {
-  val system = ActorSystem("Neptune")
-
-  val counter = system.actorOf(Props[Counter])
-
-  counter ! Tick
-  counter ! Tick
-  counter ! Tick
-
-  implicit val timeout = Timeout(5 seconds)
-
-  (counter ? Get) onSuccess {
-    case count => println("Count is " + count)
-  }
-
-  system.shutdown()
+  println("Hello world")
 }
+//object Neptune extends App {
+//  val system = ActorSystem("Neptune")
+//  val server = system.actorOf(Props[Neptune.Server])
+//
+//  val listener = new ServerSocket(6715);
+//  server ! Bind(socket, "localhost")
+//
+//  //
+//  //  case count => println("Count is " + count)
+//  //}
+//
+//  system.shutdown()
+//
+//  class Server extends IO(Tcp) {
+//    var count = 0
+//
+//    def receive = {
+//      case Tick => count += 1
+//      case Get  => sender ! count
+//    }
+//  }
+//}
