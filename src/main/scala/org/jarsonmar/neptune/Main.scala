@@ -1,4 +1,4 @@
-package org.jarsonmar
+package org.jarsonmar.neptune
 
 import akka.actor._
 import akka.util._
