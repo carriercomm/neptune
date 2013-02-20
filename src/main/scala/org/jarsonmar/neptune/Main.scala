@@ -3,9 +3,6 @@ package org.jarsonmar.neptune
 import akka.actor._
 import akka.util._
 
-
-case class CommandEntry(line: ByteString)
-
 object Neptune {
   class Listener extends Actor {
 
@@ -20,28 +17,13 @@ object Neptune {
       case IO.NewClient(server) => {
         val socket = server.accept()
         socket write ByteString("> ")
-        state(socket).flatMap(_ => Listener.processLines(socket))
+        val conn = new Connection(socket)
+        state(socket).flatMap(_ => conn.processLines)
       }
       case IO.Read(socket, bytes) => state(socket)(IO.Chunk(bytes))
       case IO.Closed(socket, cause) => {
         state(socket)(IO.EOF)
         state -= socket
-      }
-    }
-  }
-
-  object Listener {
-    val lineFeed = ByteString(0x0a) // linefeed
-
-    // Parser entrypoint
-    def processLines(socket: IO.SocketHandle): IO.Iteratee[Unit] = {
-      IO.repeat {
-        IO.takeUntil(lineFeed).map {
-          case line: ByteString => {
-            val response = Parser.process(line)
-            socket.write(response ++ ByteString("> "))
-          }
-        }
       }
     }
   }
