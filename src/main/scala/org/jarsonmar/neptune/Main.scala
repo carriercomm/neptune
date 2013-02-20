@@ -5,6 +5,7 @@ import akka.util._
 
 object Neptune {
   class Listener extends Actor {
+    private lazy val lineFeed = ByteString(0x0a)
 
     val state = IO.IterateeRef.Map.async[IO.Handle]()(context.dispatcher)
 
@@ -17,13 +18,23 @@ object Neptune {
       case IO.NewClient(server) => {
         val socket = server.accept()
         socket write ByteString("> ")
-        val conn = new Connection(socket)
-        state(socket).flatMap(_ => conn.processLines)
+        state(socket).flatMap(_ => processLines(socket))
       }
       case IO.Read(socket, bytes) => state(socket)(IO.Chunk(bytes))
       case IO.Closed(socket, cause) => {
         state(socket)(IO.EOF)
         state -= socket
+      }
+    }
+
+    private def processLines(socket: IO.SocketHandle): IO.Iteratee[Unit] = {
+      IO.repeat {
+        IO.takeUntil(lineFeed).map {
+          case line: ByteString => {
+            val response = Parser.process(line)
+            socket.write(response ++ ByteString("> "))
+          }
+        }
       }
     }
   }

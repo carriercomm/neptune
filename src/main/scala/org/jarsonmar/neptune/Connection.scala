@@ -6,7 +6,6 @@ import akka.util.ByteString
 import scala.collection.mutable.{Map,HashMap}
 
 class Connection(socket: IO.SocketHandle) {
-  private lazy val lineFeed = ByteString(0x0a) // linefeed
 
   val state: Map[String, String] = new HashMap[String, String]()
 
@@ -16,15 +15,4 @@ class Connection(socket: IO.SocketHandle) {
 
   def setName(name: String) = setState("name", name)
   def getName: Option[String] = getState("name")
-
-  def processLines: IO.Iteratee[Unit] = {
-    IO.repeat {
-      IO.takeUntil(lineFeed).map {
-        case line: ByteString => {
-          val response = Parser.process(line)
-          socket.write(response ++ ByteString("> "))
-        }
-      }
-    }
-  }
 }
