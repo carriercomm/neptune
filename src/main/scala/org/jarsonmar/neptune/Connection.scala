@@ -5,14 +5,24 @@ import akka.util.ByteString
 
 import scala.collection.mutable.{Map,HashMap}
 
-class Connection(socket: IO.SocketHandle) {
+class Connection {
+  var state: Connection.State = Connection.ExpectName()
+  val data: Map[String, String] = new HashMap[String, String]()
 
-  val state: Map[String, String] = new HashMap[String, String]()
+  private def setData(key: String, value: String) = data.put(key, value)
+  private def getData(key: String): Option[String] = data.get(key)
+  private def hasData(key: String): Boolean = data.contains(key)
 
-  private def setState(key: String, value: String) = state.put(key, value)
-  private def getState(key: String): Option[String] = state.get(key)
-  private def hasState(key: String): Boolean = state.contains(key)
+  def setName(name: String) = setData("name", name)
+  def getName: String = getData("name").getOrElse("(unknown)")
 
-  def setName(name: String) = setState("name", name)
-  def getName: Option[String] = getState("name")
+  def getState = state
+  def expectName = state = Connection.ExpectName()
+  def expectGameCommand = state = Connection.ExpectGameCommand()
+}
+
+object Connection {
+  abstract class State
+  sealed case class ExpectName() extends State
+  sealed case class ExpectGameCommand() extends State
 }

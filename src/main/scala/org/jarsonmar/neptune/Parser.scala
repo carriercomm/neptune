@@ -4,14 +4,26 @@ import akka.actor.IO
 import akka.util.ByteString
 
 object Parser {
-  def process(bytes: ByteString): ByteString = {
-    val command: String = bytes.decodeString("UTF8")
+  import Connection._
+  def process(conn: Connection, bytes: ByteString): ByteString = {
+    val command: String = bytes.decodeString("UTF8").trim
 
     val (word:String, leftover: Option[String]) = splitWord(command)
 
-    // TODO command stuff doesn't really apply here
-    //      need input state for name, entry, etc.
-    ByteString(processCommand(word, leftover) + "\n")
+    conn.getState match {
+      case ExpectName() =>
+        command match {
+          case "" => ByteString("Please enter a valid name")
+          case _ => {
+            conn.setName(command)
+            conn.expectGameCommand
+            ByteString("Name successfully set. Welcome to the game, " + conn.getName)
+          }
+        }
+        case ExpectGameCommand() => {
+          ByteString(processCommand(word, leftover))
+        }
+    }
   }
 
   // TODO move into its own thing

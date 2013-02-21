@@ -3,11 +3,14 @@ package org.jarsonmar.neptune
 import akka.actor._
 import akka.util._
 
+import collection.mutable
+
 object Neptune {
   class Listener extends Actor {
     private lazy val lineFeed = ByteString(0x0a)
 
     val state = IO.IterateeRef.Map.async[IO.Handle]()(context.dispatcher)
+    val connections: mutable.Map[IO.Handle, Connection] = mutable.Map()
 
     override def preStart {
       println("starting on port 6715")
@@ -17,8 +20,9 @@ object Neptune {
     def receive = {
       case IO.NewClient(server) => {
         val socket = server.accept()
-        socket write ByteString("> ")
-        state(socket).flatMap(_ => processLines(socket))
+        socket write ByteString("Enter your name: ")
+        connections.put(socket, new Connection())
+        state(socket) flatMap {_ => processLines(socket)}
       }
       case IO.Read(socket, bytes) => state(socket)(IO.Chunk(bytes))
       case IO.Closed(socket, cause) => {
@@ -31,8 +35,11 @@ object Neptune {
       IO.repeat {
         IO.takeUntil(lineFeed).map {
           case line: ByteString => {
-            val response = Parser.process(line)
-            socket.write(response ++ ByteString("> "))
+            val conn = connections.get(socket).getOrElse(
+              throw new Exception("Socket has no associated connection")
+            )
+            val response = Parser.process(conn, line)
+            socket.write(response ++ ByteString("\n> "))
           }
         }
       }
