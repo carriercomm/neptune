@@ -1,4 +1,4 @@
-package org.jarsonmar.neptune
+package org.jarsonmar.neptune.controller
 
 import akka.actor.IO
 import akka.util.ByteString
