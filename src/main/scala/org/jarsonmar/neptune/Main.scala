@@ -47,7 +47,12 @@ object Neptune {
   }
 }
 
-object Main extends App {
+object Controller extends App {
+  val system = ActorSystem("Neptune")
+  val server = system.actorOf(Props[Neptune.Listener])
+}
+
+object Universe extends App {
   val system = ActorSystem("Neptune")
   val server = system.actorOf(Props[Neptune.Listener])
 }
