@@ -8,6 +8,10 @@ object Controller extends App {
 }
 
 object Universe extends App {
-  val system = ActorSystem("NeptuneUniverse")
-  val server = system.actorOf(Props[controller.Dispatcher]) // XXX universe.Dispatcher
+  val dispatcher = universe.Dispatcher()
+  dispatcher.run
+}
+
+object TestThrift extends App {
+  universe.SendRequestToThrift()
 }
