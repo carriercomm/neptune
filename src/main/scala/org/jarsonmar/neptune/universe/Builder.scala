@@ -54,7 +54,6 @@ class Builder {
       }
     }
 
-    redis.getClient.set("foo", "oh hello there my name is jason")
     println(redis.getClient get "foo")
   }
 }
