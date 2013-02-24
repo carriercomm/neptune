@@ -18,6 +18,8 @@ class Dispatcher {
       val serverTransport: TServerTransport = new TServerSocket(9090);
       val server: TServer = new TSimpleServer(new TServer.Args(serverTransport).processor(service_proc));
 
+      Builder().build
+
       server.serve();
     }
     catch {
