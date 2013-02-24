@@ -53,8 +53,6 @@ class Builder {
         case _ =>
       }
     }
-
-    println(redis.getClient get "foo")
   }
 }
 
