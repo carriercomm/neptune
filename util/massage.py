@@ -16,8 +16,7 @@ def generate_data():
             combined[key] = dict(combined[key].items() + d[key].items())
 
     locations = combined["loc"]
-    for loc in locations.iteritems():
-        loc_id, loc_data, = loc
+    for loc_id, loc_data, in locations.iteritems():
         local_id, zone = loc_id.split('@')
 
         ns = lambda key: "%s:loc:%s:%s:%s" % (g_namespace, zone, local_id, key)
@@ -53,8 +52,7 @@ def generate_data():
                 out_data[ns("exits")][direction] = exit_value
 
     objects = combined["obj"]
-    for obj in objects.iteritems():
-        obj_id, obj_data, = obj
+    for obj_id, obj_data, in objects.iteritems():
         local_id, zone = obj_id.split('@')
 
         ns = lambda key: "%s:obj:%s:%s:%s" % (g_namespace, zone, local_id, key)
@@ -118,8 +116,7 @@ def generate_data():
                 out_data[ns("carriedby")] = dest_value
 
     mobiles = combined["mob"]
-    for mob in mobiles.iteritems():
-        mob_id, mob_data, = mob
+    for mob_id, mob_data, in mobiles.iteritems():
         local_id, zone = mob_id.split('@')
 
         ns = lambda key: "%s:mob:%s:%s:%s" % (g_namespace, zone, local_id, key)
