@@ -111,6 +111,42 @@ for obj in objects.iteritems():
             out_data[carry_key].append(':'.join([zone, local_id]))
             out_data[ns("carriedby")] = dest_value
 
+mobiles = combined["mob"]
+for mob in mobiles.iteritems():
+    mob_id, mob_data, = mob
+    local_id, zone = mob_id.split('@')
+
+    def ns(key):
+        return "%s:mob:%s:%s:%s" % (g_namespace, zone, local_id, key)
+
+    if ns("properties") not in out_data: out_data[ns("properties")] = {}
+    for prop in ["visibility", "damage", "examine", "strength", "desc", "speed",
+                 "aggression", "location", "name", "armor", "description",
+                 "wimpy", "pname"]:
+        if prop in mob_data:
+            out_data[ns("properties")][prop] = mob_data[prop]
+            if prop == "location":
+                dest = mob_data["location"]
+
+                if "@" not in dest:
+                    dest += "@" + zone
+
+                a = dest.split("@")
+                a.reverse()
+                dest_value = ':'.join(a).lower()
+
+                room_key = ":".join([g_namespace, "loc", dest_value, "mobs"])
+                if room_key not in out_data: out_data[room_key] = []
+                out_data[room_key].append(':'.join([zone, local_id]))
+                out_data[ns("location")] = dest_value
+
+    for flags in ["eflags", "sflag", "sflags",
+                  "pflag", "pflags", "mflag", "mflags"]:
+        if prop in mob_data:
+            flag_key = prop
+            if flag_key.endswith("g"): flag_key += "s"
+            out_data[ns("properties")][flag_key] = mob_data[prop]
+
 f = open("new.json", "w")
 f.write(json.dumps(out_data, indent=2))
 f.close()
