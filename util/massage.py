@@ -45,8 +45,7 @@ def generate_data():
                     out_data[object_link_key] = {}
                 out_data[object_link_key][direction] = ex
             else:
-                a = ex.split("@") # TODO use join.reveerse etc
-                exit_value = "%s:%s" % (a[1], a[0])
+                exit_value = ":".join(reversed(ex.split("@")))
                 if ns("exits") not in out_data:
                     out_data[ns("exits")] = {}
                 out_data[ns("exits")][direction] = exit_value
@@ -81,9 +80,7 @@ def generate_data():
                 dest += "@" + zone
 
             # ThInG@zone becomes zone:thing
-            a = dest.split("@")
-            a.reverse()
-            dest_value = ':'.join(a).lower()
+            dest_value = ':'.join(reversed(dest.split("@"))).lower()
 
             # These will be in redis sets
             if loc_type == "IN_ROOM":
@@ -134,9 +131,7 @@ def generate_data():
                     if "@" not in dest:
                         dest += "@" + zone
 
-                    a = dest.split("@")
-                    a.reverse()
-                    dest_value = ':'.join(a).lower()
+                    dest_value = ':'.join(reversed(dest.split("@"))).lower()
 
                     room_key = ":".join([g_namespace, "loc", dest_value, "mobs"])
                     if room_key not in out_data:
