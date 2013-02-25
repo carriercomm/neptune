@@ -41,9 +41,10 @@ def generate_data():
             if ex.startswith("^"):
                 ex = ex.lstrip("^")
                 object_link_key = "%s:%s:%s:%s:links" % (g_namespace, "obj", zone, local_id)
+                exit_value = ":".join(reversed(ex.split("@")))
                 if object_link_key not in out_data:
                     out_data[object_link_key] = {}
-                out_data[object_link_key][direction] = ex
+                out_data[object_link_key][direction] = exit_value
             else:
                 exit_value = ":".join(reversed(ex.split("@")))
                 if ns("exits") not in out_data:
