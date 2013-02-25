@@ -21,7 +21,9 @@ for loc in locations.iteritems():
     def ns(key):
         return "%s:loc:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
-    if ns("properties") not in out_data: out_data[ns("properties")] = {}
+    if ns("properties") not in out_data:
+        out_data[ns("properties")] = {}
+
     out_data[ns("properties")]["title"]       = loc_data["title"]
     out_data[ns("properties")]["description"] = loc_data["description"]
     out_data[ns("properties")]["altitude"]    = loc_data["altitude"]
@@ -29,7 +31,8 @@ for loc in locations.iteritems():
     out_data[ns("flags")] = loc_data["flags"]
 
     for direction in ["n", "s", "e", "w", "u", "d"]:
-        if direction not in loc_data["exits"]: continue
+        if direction not in loc_data["exits"]:
+            continue
 
         ex = loc_data["exits"][direction]
         if "@" not in ex:
@@ -38,12 +41,14 @@ for loc in locations.iteritems():
         if ex.startswith("^"):
             ex = ex.lstrip("^")
             object_link_key = "%s:%s:%s:%s:links" % (g_namespace, "obj", zone, local_id)
-            if object_link_key not in out_data: out_data[object_link_key] = {}
+            if object_link_key not in out_data:
+                out_data[object_link_key] = {}
             out_data[object_link_key][direction] = ex
         else:
             a = ex.split("@") # TODO use join.reveerse etc
             exit_value = "%s:%s" % (a[1], a[0])
-            if ns("exits") not in out_data: out_data[ns("exits")] = {}
+            if ns("exits") not in out_data:
+                out_data[ns("exits")] = {}
             out_data[ns("exits")][direction] = exit_value
 
 objects = combined["obj"]
@@ -54,7 +59,8 @@ for obj in objects.iteritems():
     def ns(key):
         return "%s:obj:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
-    if ns("properties") not in out_data: out_data[ns("properties")] = {}
+    if ns("properties") not in out_data:
+        out_data[ns("properties")] = {}
     for prop in ["visibility", "state", "examine[0]", "weight", "bvalue",
                  "desc[3]", "name", "desc[2]", "pname",
                  "examine[1]", "desc[0]", "damage", "examine", "size",
@@ -119,7 +125,8 @@ for mob in mobiles.iteritems():
     def ns(key):
         return "%s:mob:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
-    if ns("properties") not in out_data: out_data[ns("properties")] = {}
+    if ns("properties") not in out_data:
+        out_data[ns("properties")] = {}
     for prop in ["visibility", "damage", "examine", "strength", "desc", "speed",
                  "aggression", "location", "name", "armor", "description",
                  "wimpy", "pname"]:
@@ -136,7 +143,8 @@ for mob in mobiles.iteritems():
                 dest_value = ':'.join(a).lower()
 
                 room_key = ":".join([g_namespace, "loc", dest_value, "mobs"])
-                if room_key not in out_data: out_data[room_key] = []
+                if room_key not in out_data:
+                    out_data[room_key] = []
                 out_data[room_key].append(':'.join([zone, local_id]))
                 out_data[ns("location")] = dest_value
 
@@ -144,7 +152,8 @@ for mob in mobiles.iteritems():
                   "pflag", "pflags", "mflag", "mflags"]:
         if prop in mob_data:
             flag_key = prop
-            if flag_key.endswith("g"): flag_key += "s"
+            if flag_key.endswith("g"):
+                flag_key += "s"
             out_data[ns("properties")][flag_key] = mob_data[prop]
 
 f = open("new.json", "w")
