@@ -60,7 +60,10 @@ def generate_data():
                     "examine[1]", "desc[0]", "damage", "examine", "size",
                     "desc[]", "maxstate", "desc[1]", "altname", "armor", "linked"]:
             if prop in obj_data:
-                out_data[ns("properties")][prop] = obj_data[prop]
+                if prop == "linked":
+                    out_data[ns("properties")][prop] = ensure_zone(obj_data["linked"], zone)
+                else:
+                    out_data[ns("properties")][prop] = obj_data[prop]
 
         if "oflag" in obj_data:
             out_data[ns("oflags")] = obj_data["oflag"]
