@@ -99,13 +99,13 @@ for obj in objects.iteritems():
             out_data[wield_key] = ':'.join([zone, local_id]) # only one at a time
             out_data[ns("wieldedby")] = dest_value
         elif loc_type == "WORN_BY":
-            wear_key = ":".join([g_namespace, "obj", dest_value, "wearing"])
+            wear_key = ":".join([g_namespace, "mob", dest_value, "wearing"])
             if wear_key not in out_data:
                 out_data[wear_key] = []
             out_data[wear_key].append(':'.join([zone, local_id]))
             out_data[ns("wornby")] = dest_value
         elif loc_type == "CARRIED_BY":
-            carry_key = ":".join([g_namespace, "obj", dest_value, "carrying"])
+            carry_key = ":".join([g_namespace, "mob", dest_value, "carrying"])
             if carry_key not in out_data:
                 out_data[carry_key] = []
             out_data[carry_key].append(':'.join([zone, local_id]))
