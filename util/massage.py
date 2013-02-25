@@ -35,18 +35,14 @@ def generate_data():
                 continue
 
             ex = loc_data["exits"][direction]
-            if "@" not in ex:
-                ex += "@" + zone
+            exit_value = ensure_zone(ex.lstrip("^"), zone)
 
             if ex.startswith("^"):
-                ex = ex.lstrip("^")
                 object_link_key = "%s:%s:%s:%s:links" % (g_namespace, "obj", zone, local_id)
-                exit_value = ":".join(reversed(ex.split("@")))
                 if object_link_key not in out_data:
                     out_data[object_link_key] = {}
                 out_data[object_link_key][direction] = exit_value
             else:
-                exit_value = ":".join(reversed(ex.split("@")))
                 if ns("exits") not in out_data:
                     out_data[ns("exits")] = {}
                 out_data[ns("exits")][direction] = exit_value
@@ -77,11 +73,7 @@ def generate_data():
                 obj_data["location"] += ":" + zone
 
             loc_type, dest = obj_data["location"].split(":")
-            if "@" not in dest:
-                dest += "@" + zone
-
-            # ThInG@zone becomes zone:thing
-            dest_value = ':'.join(reversed(dest.split("@"))).lower()
+            dest_value = ensure_zone(dest, zone)
 
             # These will be in redis sets
             if loc_type == "IN_ROOM":
@@ -128,11 +120,7 @@ def generate_data():
                 out_data[ns("properties")][prop] = mob_data[prop]
                 if prop == "location":
                     dest = mob_data["location"]
-
-                    if "@" not in dest:
-                        dest += "@" + zone
-
-                    dest_value = ':'.join(reversed(dest.split("@"))).lower()
+                    dest_value = ensure_zone(dest, zone)
 
                     room_key = ":".join([g_namespace, "loc", dest_value, "mobs"])
                     if room_key not in out_data:
@@ -148,6 +136,14 @@ def generate_data():
                     flag_key += "s"
                 out_data[ns("properties")][flag_key] = mob_data[prop]
     return out_data
+
+def ensure_zone(val, zone):
+    ret = val
+    if "@" not in ret:
+        ret += "@" + zone
+
+    return ':'.join(reversed(ret.split("@"))).lower()
+
 
 f = open("new.json", "w")
 f.write(json.dumps(generate_data(), indent=2))
