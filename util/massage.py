@@ -20,8 +20,7 @@ def generate_data():
         loc_id, loc_data, = loc
         local_id, zone = loc_id.split('@')
 
-        def ns(key):
-            return "%s:loc:%s:%s:%s" % (g_namespace, zone, local_id, key)
+        ns = lambda key: "%s:loc:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
         if ns("properties") not in out_data:
             out_data[ns("properties")] = {}
@@ -58,8 +57,7 @@ def generate_data():
         obj_id, obj_data, = obj
         local_id, zone = obj_id.split('@')
 
-        def ns(key):
-            return "%s:obj:%s:%s:%s" % (g_namespace, zone, local_id, key)
+        ns = lambda key: "%s:obj:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
         if ns("properties") not in out_data:
             out_data[ns("properties")] = {}
@@ -124,8 +122,7 @@ def generate_data():
         mob_id, mob_data, = mob
         local_id, zone = mob_id.split('@')
 
-        def ns(key):
-            return "%s:mob:%s:%s:%s" % (g_namespace, zone, local_id, key)
+        ns = lambda key: "%s:mob:%s:%s:%s" % (g_namespace, zone, local_id, key)
 
         if ns("properties") not in out_data:
             out_data[ns("properties")] = {}
