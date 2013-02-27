@@ -11,16 +11,17 @@ import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
 
-public enum RequestType implements org.apache.thrift.TEnum {
-  CREATE(1),
-  READ(2),
-  UPDATE(3),
-  DELETE(4),
-  LIST(5);
+public enum LocProp implements org.apache.thrift.TEnum {
+  MOBS(1),
+  PLRS(2),
+  OBJS(3),
+  EXIT(4),
+  PROP(5),
+  FLAG(6);
 
   private final int value;
 
-  private RequestType(int value) {
+  private LocProp(int value) {
     this.value = value;
   }
 
@@ -35,18 +36,20 @@ public enum RequestType implements org.apache.thrift.TEnum {
    * Find a the enum type by its integer value, as defined in the Thrift IDL.
    * @return null if the value is not found.
    */
-  public static RequestType findByValue(int value) { 
+  public static LocProp findByValue(int value) { 
     switch (value) {
       case 1:
-        return CREATE;
+        return MOBS;
       case 2:
-        return READ;
+        return PLRS;
       case 3:
-        return UPDATE;
+        return OBJS;
       case 4:
-        return DELETE;
+        return EXIT;
       case 5:
-        return LIST;
+        return PROP;
+      case 6:
+        return FLAG;
       default:
         return null;
     }

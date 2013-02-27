@@ -1,18 +1,43 @@
 namespace java org.jarsonmar.neptune.thrift
 
-enum RequestType {
-    CREATE = 1,
-    READ   = 2,
-    UPDATE = 3,
-    DELETE = 4,
-    LIST   = 5,
+enum LocProp {
+    MOBS = 1,
+    PLRS = 2,
+    OBJS = 3,
+    EXIT = 4,
+    PROP = 5,
+    FLAG = 6,
 }
 
-struct Request {
-    1: RequestType rtype,
-    2: map<string, string> params, // XXX fill out with specific data
+enum ExitProp {
+    ALL   = 1,
+    NORTH = 2,
+    SOUTH = 3,
+    EAST  = 4,
+    WEST  = 5,
+    UP    = 6,
+    DOWN  = 7,
 }
 
-service RequestService {
-    void processRequest(1: Request req),
+struct LocReadRequest {
+    1: set<string>    id,
+    3: map<LocProp, set<string>> props,
+}
+
+struct LocReadInstance {
+    1: string id,
+    2: set<string> mobs,
+    3: set<string> plrs,
+    4: set<string> objs,
+    5: map<ExitProp, string> exits,
+    6: map<string, string> props,
+    7: set<string> flags,
+}
+
+struct LocReadResponse {
+    1: map<string, LocReadInstance> locs,
+}
+
+service LocRequestService {
+    LocReadResponse readRequest(1: LocReadRequest req),
 }

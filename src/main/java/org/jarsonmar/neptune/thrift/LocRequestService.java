@@ -30,17 +30,17 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RequestService {
+public class LocRequestService {
 
   public interface Iface {
 
-    public void processRequest(Request req) throws org.apache.thrift.TException;
+    public LocReadResponse readRequest(LocReadRequest req) throws org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void processRequest(Request req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.processRequest_call> resultHandler) throws org.apache.thrift.TException;
+    public void readRequest(LocReadRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.readRequest_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -64,24 +64,27 @@ public class RequestService {
       super(iprot, oprot);
     }
 
-    public void processRequest(Request req) throws org.apache.thrift.TException
+    public LocReadResponse readRequest(LocReadRequest req) throws org.apache.thrift.TException
     {
-      send_processRequest(req);
-      recv_processRequest();
+      send_readRequest(req);
+      return recv_readRequest();
     }
 
-    public void send_processRequest(Request req) throws org.apache.thrift.TException
+    public void send_readRequest(LocReadRequest req) throws org.apache.thrift.TException
     {
-      processRequest_args args = new processRequest_args();
+      readRequest_args args = new readRequest_args();
       args.setReq(req);
-      sendBase("processRequest", args);
+      sendBase("readRequest", args);
     }
 
-    public void recv_processRequest() throws org.apache.thrift.TException
+    public LocReadResponse recv_readRequest() throws org.apache.thrift.TException
     {
-      processRequest_result result = new processRequest_result();
-      receiveBase(result, "processRequest");
-      return;
+      readRequest_result result = new readRequest_result();
+      receiveBase(result, "readRequest");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "readRequest failed: unknown result");
     }
 
   }
@@ -102,35 +105,35 @@ public class RequestService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void processRequest(Request req, org.apache.thrift.async.AsyncMethodCallback<processRequest_call> resultHandler) throws org.apache.thrift.TException {
+    public void readRequest(LocReadRequest req, org.apache.thrift.async.AsyncMethodCallback<readRequest_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      processRequest_call method_call = new processRequest_call(req, resultHandler, this, ___protocolFactory, ___transport);
+      readRequest_call method_call = new readRequest_call(req, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class processRequest_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private Request req;
-      public processRequest_call(Request req, org.apache.thrift.async.AsyncMethodCallback<processRequest_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+    public static class readRequest_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private LocReadRequest req;
+      public readRequest_call(LocReadRequest req, org.apache.thrift.async.AsyncMethodCallback<readRequest_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.req = req;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("processRequest", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        processRequest_args args = new processRequest_args();
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("readRequest", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        readRequest_args args = new readRequest_args();
         args.setReq(req);
         args.write(prot);
         prot.writeMessageEnd();
       }
 
-      public void getResult() throws org.apache.thrift.TException {
+      public LocReadResponse getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        (new Client(prot)).recv_processRequest();
+        return (new Client(prot)).recv_readRequest();
       }
     }
 
@@ -147,44 +150,44 @@ public class RequestService {
     }
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
-      processMap.put("processRequest", new processRequest());
+      processMap.put("readRequest", new readRequest());
       return processMap;
     }
 
-    public static class processRequest<I extends Iface> extends org.apache.thrift.ProcessFunction<I, processRequest_args> {
-      public processRequest() {
-        super("processRequest");
+    public static class readRequest<I extends Iface> extends org.apache.thrift.ProcessFunction<I, readRequest_args> {
+      public readRequest() {
+        super("readRequest");
       }
 
-      public processRequest_args getEmptyArgsInstance() {
-        return new processRequest_args();
+      public readRequest_args getEmptyArgsInstance() {
+        return new readRequest_args();
       }
 
       protected boolean isOneway() {
         return false;
       }
 
-      public processRequest_result getResult(I iface, processRequest_args args) throws org.apache.thrift.TException {
-        processRequest_result result = new processRequest_result();
-        iface.processRequest(args.req);
+      public readRequest_result getResult(I iface, readRequest_args args) throws org.apache.thrift.TException {
+        readRequest_result result = new readRequest_result();
+        result.success = iface.readRequest(args.req);
         return result;
       }
     }
 
   }
 
-  public static class processRequest_args implements org.apache.thrift.TBase<processRequest_args, processRequest_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("processRequest_args");
+  public static class readRequest_args implements org.apache.thrift.TBase<readRequest_args, readRequest_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("readRequest_args");
 
     private static final org.apache.thrift.protocol.TField REQ_FIELD_DESC = new org.apache.thrift.protocol.TField("req", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new processRequest_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new processRequest_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new readRequest_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new readRequest_argsTupleSchemeFactory());
     }
 
-    public Request req; // required
+    public LocReadRequest req; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -249,16 +252,16 @@ public class RequestService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.REQ, new org.apache.thrift.meta_data.FieldMetaData("req", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Request.class)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LocReadRequest.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(processRequest_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(readRequest_args.class, metaDataMap);
     }
 
-    public processRequest_args() {
+    public readRequest_args() {
     }
 
-    public processRequest_args(
-      Request req)
+    public readRequest_args(
+      LocReadRequest req)
     {
       this();
       this.req = req;
@@ -267,14 +270,14 @@ public class RequestService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public processRequest_args(processRequest_args other) {
+    public readRequest_args(readRequest_args other) {
       if (other.isSetReq()) {
-        this.req = new Request(other.req);
+        this.req = new LocReadRequest(other.req);
       }
     }
 
-    public processRequest_args deepCopy() {
-      return new processRequest_args(this);
+    public readRequest_args deepCopy() {
+      return new readRequest_args(this);
     }
 
     @Override
@@ -282,11 +285,11 @@ public class RequestService {
       this.req = null;
     }
 
-    public Request getReq() {
+    public LocReadRequest getReq() {
       return this.req;
     }
 
-    public processRequest_args setReq(Request req) {
+    public readRequest_args setReq(LocReadRequest req) {
       this.req = req;
       return this;
     }
@@ -312,7 +315,7 @@ public class RequestService {
         if (value == null) {
           unsetReq();
         } else {
-          setReq((Request)value);
+          setReq((LocReadRequest)value);
         }
         break;
 
@@ -345,12 +348,12 @@ public class RequestService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof processRequest_args)
-        return this.equals((processRequest_args)that);
+      if (that instanceof readRequest_args)
+        return this.equals((readRequest_args)that);
       return false;
     }
 
-    public boolean equals(processRequest_args that) {
+    public boolean equals(readRequest_args that) {
       if (that == null)
         return false;
 
@@ -371,13 +374,13 @@ public class RequestService {
       return 0;
     }
 
-    public int compareTo(processRequest_args other) {
+    public int compareTo(readRequest_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      processRequest_args typedOther = (processRequest_args)other;
+      readRequest_args typedOther = (readRequest_args)other;
 
       lastComparison = Boolean.valueOf(isSetReq()).compareTo(typedOther.isSetReq());
       if (lastComparison != 0) {
@@ -406,7 +409,7 @@ public class RequestService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("processRequest_args(");
+      StringBuilder sb = new StringBuilder("readRequest_args(");
       boolean first = true;
 
       sb.append("req:");
@@ -444,15 +447,15 @@ public class RequestService {
       }
     }
 
-    private static class processRequest_argsStandardSchemeFactory implements SchemeFactory {
-      public processRequest_argsStandardScheme getScheme() {
-        return new processRequest_argsStandardScheme();
+    private static class readRequest_argsStandardSchemeFactory implements SchemeFactory {
+      public readRequest_argsStandardScheme getScheme() {
+        return new readRequest_argsStandardScheme();
       }
     }
 
-    private static class processRequest_argsStandardScheme extends StandardScheme<processRequest_args> {
+    private static class readRequest_argsStandardScheme extends StandardScheme<readRequest_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, processRequest_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, readRequest_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -464,7 +467,7 @@ public class RequestService {
           switch (schemeField.id) {
             case 1: // REQ
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.req = new Request();
+                struct.req = new LocReadRequest();
                 struct.req.read(iprot);
                 struct.setReqIsSet(true);
               } else { 
@@ -482,7 +485,7 @@ public class RequestService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, processRequest_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, readRequest_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -497,16 +500,16 @@ public class RequestService {
 
     }
 
-    private static class processRequest_argsTupleSchemeFactory implements SchemeFactory {
-      public processRequest_argsTupleScheme getScheme() {
-        return new processRequest_argsTupleScheme();
+    private static class readRequest_argsTupleSchemeFactory implements SchemeFactory {
+      public readRequest_argsTupleScheme getScheme() {
+        return new readRequest_argsTupleScheme();
       }
     }
 
-    private static class processRequest_argsTupleScheme extends TupleScheme<processRequest_args> {
+    private static class readRequest_argsTupleScheme extends TupleScheme<readRequest_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, processRequest_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, readRequest_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetReq()) {
@@ -519,11 +522,11 @@ public class RequestService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, processRequest_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, readRequest_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.req = new Request();
+          struct.req = new LocReadRequest();
           struct.req.read(iprot);
           struct.setReqIsSet(true);
         }
@@ -532,20 +535,22 @@ public class RequestService {
 
   }
 
-  public static class processRequest_result implements org.apache.thrift.TBase<processRequest_result, processRequest_result._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("processRequest_result");
+  public static class readRequest_result implements org.apache.thrift.TBase<readRequest_result, readRequest_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("readRequest_result");
 
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new processRequest_resultStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new processRequest_resultTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new readRequest_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new readRequest_resultTupleSchemeFactory());
     }
 
+    public LocReadResponse success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+      SUCCESS((short)0, "success");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -560,6 +565,8 @@ public class RequestService {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
           default:
             return null;
         }
@@ -598,37 +605,87 @@ public class RequestService {
         return _fieldName;
       }
     }
+
+    // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LocReadResponse.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(processRequest_result.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(readRequest_result.class, metaDataMap);
     }
 
-    public processRequest_result() {
+    public readRequest_result() {
+    }
+
+    public readRequest_result(
+      LocReadResponse success)
+    {
+      this();
+      this.success = success;
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public processRequest_result(processRequest_result other) {
+    public readRequest_result(readRequest_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new LocReadResponse(other.success);
+      }
     }
 
-    public processRequest_result deepCopy() {
-      return new processRequest_result(this);
+    public readRequest_result deepCopy() {
+      return new readRequest_result(this);
     }
 
     @Override
     public void clear() {
+      this.success = null;
+    }
+
+    public LocReadResponse getSuccess() {
+      return this.success;
+    }
+
+    public readRequest_result setSuccess(LocReadResponse success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((LocReadResponse)value);
+        }
+        break;
+
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
       }
       throw new IllegalStateException();
     }
@@ -640,6 +697,8 @@ public class RequestService {
       }
 
       switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -648,14 +707,23 @@ public class RequestService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof processRequest_result)
-        return this.equals((processRequest_result)that);
+      if (that instanceof readRequest_result)
+        return this.equals((readRequest_result)that);
       return false;
     }
 
-    public boolean equals(processRequest_result that) {
+    public boolean equals(readRequest_result that) {
       if (that == null)
         return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
 
       return true;
     }
@@ -665,14 +733,24 @@ public class RequestService {
       return 0;
     }
 
-    public int compareTo(processRequest_result other) {
+    public int compareTo(readRequest_result other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      processRequest_result typedOther = (processRequest_result)other;
+      readRequest_result typedOther = (readRequest_result)other;
 
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -690,9 +768,16 @@ public class RequestService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("processRequest_result(");
+      StringBuilder sb = new StringBuilder("readRequest_result(");
       boolean first = true;
 
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -700,6 +785,9 @@ public class RequestService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -718,15 +806,15 @@ public class RequestService {
       }
     }
 
-    private static class processRequest_resultStandardSchemeFactory implements SchemeFactory {
-      public processRequest_resultStandardScheme getScheme() {
-        return new processRequest_resultStandardScheme();
+    private static class readRequest_resultStandardSchemeFactory implements SchemeFactory {
+      public readRequest_resultStandardScheme getScheme() {
+        return new readRequest_resultStandardScheme();
       }
     }
 
-    private static class processRequest_resultStandardScheme extends StandardScheme<processRequest_result> {
+    private static class readRequest_resultStandardScheme extends StandardScheme<readRequest_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, processRequest_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, readRequest_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -736,6 +824,15 @@ public class RequestService {
             break;
           }
           switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new LocReadResponse();
+                struct.success.read(iprot);
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -747,32 +844,51 @@ public class RequestService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, processRequest_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, readRequest_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
 
     }
 
-    private static class processRequest_resultTupleSchemeFactory implements SchemeFactory {
-      public processRequest_resultTupleScheme getScheme() {
-        return new processRequest_resultTupleScheme();
+    private static class readRequest_resultTupleSchemeFactory implements SchemeFactory {
+      public readRequest_resultTupleScheme getScheme() {
+        return new readRequest_resultTupleScheme();
       }
     }
 
-    private static class processRequest_resultTupleScheme extends TupleScheme<processRequest_result> {
+    private static class readRequest_resultTupleScheme extends TupleScheme<readRequest_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, processRequest_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, readRequest_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          struct.success.write(oprot);
+        }
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, processRequest_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, readRequest_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = new LocReadResponse();
+          struct.success.read(iprot);
+          struct.setSuccessIsSet(true);
+        }
       }
     }
 
