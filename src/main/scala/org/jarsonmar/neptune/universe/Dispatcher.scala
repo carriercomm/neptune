@@ -7,18 +7,36 @@ import org.apache.thrift.server._
 import org.apache.thrift.transport._
 import org.apache.thrift.protocol._
 
+import collection.mutable
+
 import org.jarsonmar.neptune.thrift
 
+object Startup {
+  abstract class Build
+
+  sealed case class Fresh extends Build // rebuild redis cache
+  sealed case class Resume extends Build // start without rebuilding redis cache
+}
+
+class ShutitDown(t: TServerTransport) extends Thread {
+  override def run = t.close()
+}
+
 class Dispatcher {
-  def run = {
-    val proc = new RequestProcessor()
-    val service_proc = new thrift.RequestService.Processor(proc)
+  def run(build_type: Startup.Build) = {
+    val redis: Redis = new Redis()
+    val proc = new RequestProcessor(redis)
+    val service_proc = new thrift.LocRequestService.Processor(proc)
 
     try {
       val serverTransport: TServerTransport = new TServerSocket(9090);
       val server: TServer = new TSimpleServer(new TServer.Args(serverTransport).processor(service_proc));
+      Runtime.getRuntime().addShutdownHook(new ShutitDown(serverTransport))
 
-      Builder().build
+      build_type match {
+        case Startup.Fresh() => Builder().build
+        case Startup.Resume() => /* just start without building */
+      }
 
       server.serve();
     }
@@ -33,17 +51,34 @@ object Dispatcher {
 }
 
 object SendRequestToThrift {
+  import collection.JavaConversions._
   def apply() = {
     val transport: TTransport = new TSocket("localhost", 9090);
     transport.open();
 
     try {
       val protocol: TProtocol = new TBinaryProtocol(transport);
-      val client: thrift.RequestService.Client = new thrift.RequestService.Client(protocol)
+      val client: thrift.LocRequestService.Client = new thrift.LocRequestService.Client(protocol)
 
-      val req: thrift.Request = new thrift.Request()
-      req.rtype = thrift.RequestType.READ
-      client.processRequest(req)
+      val req: thrift.LocReadRequest = new thrift.LocReadRequest()
+      val myid = "start:church"
+      req.id = Set(myid)
+      req.props = mutable.Map(
+        thrift.LocProp.PROP -> setAsJavaSet(Set("title", "description")),
+        thrift.LocProp.EXIT -> setAsJavaSet(Set("n"))
+      )
+
+      val res: thrift.LocReadResponse = client.readRequest(req)
+
+      Option(res.locs.get(myid)) map { loc =>
+        println(loc.props.get("title"))
+        println(loc.props.get("description"))
+        println()
+        println("North exit: " + loc.exits.get(thrift.ExitProp.NORTH))
+        if (loc.exits.get(thrift.ExitProp.SOUTH) != null) {
+          println("Failed to exclude south exit!")
+        }
+      } getOrElse { println("Location not found!") }
 
       transport.close();
     }

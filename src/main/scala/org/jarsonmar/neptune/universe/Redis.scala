@@ -15,6 +15,7 @@ class Redis(host: String = "localhost", port: Int = 6379) {
   // hash stuff
   def hset(key: String, field: String, value: String) = client.hset(key, field, value)
   def hget(key: String, field: String) = client.hget(key, field)
+  def hmget(key: String, fields: String*) = client.hmget(key, fields:_*)
 
   // set stuff
   def sadd(key: String, value: String) = client.set(key, value)

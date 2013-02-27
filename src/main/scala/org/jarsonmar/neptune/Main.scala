@@ -9,7 +9,8 @@ object Controller extends App {
 
 object Universe extends App {
   val dispatcher = universe.Dispatcher()
-  dispatcher.run
+  dispatcher.run(universe.Startup.Resume())
+
 }
 
 object TestThrift extends App {
