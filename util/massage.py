@@ -96,28 +96,8 @@ def generate_data():
             loc_type, dest = obj_data["location"].split(":")
             dest_value = ensure_zone(dest, zone)
 
-            # These will be in redis sets
             val = ':'.join([zone, local_id])
-            if loc_type == "IN_ROOM":
-                room_key = ":".join([g_namespace(), "loc", dest_value, "objs"])
-                add_to_value(out_data, room_key, val)
-                out_data[ns("location")] = dest_value
-            elif loc_type == "IN_CONTAINER":
-                cont_key = ":".join([g_namespace(), "obj", dest_value, "containing"])
-                add_to_value(out_data, cont_key, val)
-                out_data[ns("container")] = dest_value
-            elif loc_type == "WIELDED_BY":
-                wield_key = ":".join([g_namespace(), "mob", dest_value, "wielding"])
-                out_data[wield_key] = val # only one at a time
-                out_data[ns("wieldedby")] = dest_value
-            elif loc_type == "WORN_BY":
-                wear_key = ":".join([g_namespace(), "mob", dest_value, "wearing"])
-                add_to_value(out_data, wear_key, val)
-                out_data[ns("wornby")] = dest_value
-            elif loc_type == "CARRIED_BY":
-                carry_key = ":".join([g_namespace(), "mob", dest_value, "carrying"])
-                add_to_value(out_data, carry_key, val)
-                out_data[ns("carriedby")] = dest_value
+            add_to_redis_sets(ns, out_data, loc_type, dest_value, val)
 
     mobiles = combined["mob"]
     for mob_id, mob_data, in mobiles.iteritems():
@@ -150,6 +130,28 @@ def generate_data():
                     flag_key += "s"
                 out_data[ns("properties")][flag_key] = mob_data[prop]
     return out_data
+
+def add_to_redis_sets(ns, out_data, loc_type, dest_value, val):
+    if loc_type == "IN_ROOM":
+        room_key = ":".join([g_namespace(), "loc", dest_value, "objs"])
+        add_to_value(out_data, room_key, val)
+        out_data[ns("location")] = dest_value
+    elif loc_type == "IN_CONTAINER":
+        cont_key = ":".join([g_namespace(), "obj", dest_value, "containing"])
+        add_to_value(out_data, cont_key, val)
+        out_data[ns("container")] = dest_value
+    elif loc_type == "WIELDED_BY":
+        wield_key = ":".join([g_namespace(), "mob", dest_value, "wielding"])
+        out_data[wield_key] = val # only one at a time
+        out_data[ns("wieldedby")] = dest_value
+    elif loc_type == "WORN_BY":
+        wear_key = ":".join([g_namespace(), "mob", dest_value, "wearing"])
+        add_to_value(out_data, wear_key, val)
+        out_data[ns("wornby")] = dest_value
+    elif loc_type == "CARRIED_BY":
+        carry_key = ":".join([g_namespace(), "mob", dest_value, "carrying"])
+        add_to_value(out_data, carry_key, val)
+        out_data[ns("carriedby")] = dest_value
 
 def ensure_zone(val, zone):
     ret = val
