@@ -11,29 +11,28 @@ class Builder {
   )
 
   def build = {
-
+    println("Beginning import...")
     val stream = getClass.getClassLoader.getResourceAsStream("zones.json")
     val json = io.Source.fromInputStream(stream).mkString
     val zone_data = JSON parseRaw json
     zone_data map {
       _.asInstanceOf[JSONObject].obj.toIterator foreach {
         case (key, data_value) => data_value match {
-          case JSONArray(l) => l foreach { e: Any =>
-            if (e.isInstanceOf[String]) { // would be null otherwise
-              redis.sadd(key, e.asInstanceOf[String])
-            }
+          case JSONArray(l) => l foreach {
+            case (e: String) => redis.sadd(key, e)
+            case _ => /* nothin */
           }
           case JSONObject(o) => o.toIterator foreach {
-            case (hash_field, hash_value) => {
-              if (hash_value.isInstanceOf[String]) {
-                redis.hset(key, hash_field, hash_value.asInstanceOf[String])
-              }
+            case (hash_field, hash_value: String) => {
+              redis.hset(key, hash_field, hash_value)
             }
+            case _ => /* nothin */
           }
           case s: String => redis.set(key, s)
         }
       }
     }
+    println("Finished import!")
   }
 }
 
