@@ -18,11 +18,7 @@ object Startup {
   case object Resume extends Build // start without rebuilding redis cache
 }
 
-class ShutitDown(t: TServerTransport) extends Thread {
-  override def run = t.close()
-}
-
-class Dispatcher {
+class ThriftListener {
   def run(build_type: Startup.Build) = {
     val redis: Redis = new Redis()
     val proc = new RequestProcessor(redis)
@@ -31,7 +27,6 @@ class Dispatcher {
     try {
       val serverTransport: TServerTransport = new TServerSocket(9090);
       val server: TServer = new TSimpleServer(new TServer.Args(serverTransport).processor(service_proc));
-      Runtime.getRuntime().addShutdownHook(new ShutitDown(serverTransport))
 
       build_type match {
         case Startup.Fresh => Builder().build
@@ -43,6 +38,25 @@ class Dispatcher {
     catch {
       case e: Exception => e.printStackTrace();
     }
+  }
+}
+
+class Nature extends Runnable {
+  def run = {
+    while(true) {
+      Thread.sleep(60 * 1000)
+      println("heartbeat - this will be replaced with natural things")
+    }
+  }
+}
+
+class Dispatcher {
+  def run(build_type: Startup.Build) = {
+    val nature = new Thread(new Nature())
+    val thrift_listener = new ThriftListener()
+
+    nature.start() // thread in the background
+    thrift_listener.run(Startup.Resume)
   }
 }
 
