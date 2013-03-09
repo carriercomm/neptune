@@ -12,10 +12,10 @@ import collection.mutable
 import org.jarsonmar.neptune.thrift
 
 object Startup {
-  abstract class Build
+  sealed trait Build
 
-  sealed case class Fresh extends Build // rebuild redis cache
-  sealed case class Resume extends Build // start without rebuilding redis cache
+  case object Fresh extends Build // rebuild redis cache
+  case object Resume extends Build // start without rebuilding redis cache
 }
 
 class ShutitDown(t: TServerTransport) extends Thread {
@@ -34,8 +34,8 @@ class Dispatcher {
       Runtime.getRuntime().addShutdownHook(new ShutitDown(serverTransport))
 
       build_type match {
-        case Startup.Fresh() => Builder().build
-        case Startup.Resume() => /* just start without building */
+        case Startup.Fresh => Builder().build
+        case Startup.Resume => /* just start without building */
       }
 
       server.serve();
