@@ -130,11 +130,11 @@ def generate_data():
         #     2) a room with the NoMobiles flag (TODO)
         #   Has no speed or speed is 0
         if "speed" in mob_data:
-            if mob_data["speed"] > 0:
+            if int(mob_data["speed"]) > 0:
                 set_nested_value(mob_metadata, mob_key, "movable", 1)
 
         if "aggression" in mob_data:
-            if mob_data["aggression"] > 0:
+            if int(mob_data["aggression"]) > 0:
                 set_nested_value(mob_metadata, mob_key, "hostile", 1)
 
         for flags in ["eflags", "sflag", "sflags",
