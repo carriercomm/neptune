@@ -23,7 +23,7 @@ def add_to_nested_value(o, k, p, v):
     o[k][p].append(v)
 
 def generate_data():
-    iter = glob.glob('./zones/*.json')
+    iter = glob.glob('./pl/zones/*.json')
 
     movables_key = "%s:%s" % (g_namespace(), 'movables')
     hostiles_key = "%s:%s" % (g_namespace(), 'hostiles')
@@ -185,6 +185,6 @@ def ensure_zone(val, zone):
     return ':'.join(reversed(ret.split("@"))).lower()
 
 
-f = open("new.json", "w")
+f = open("../src/main/resources/zones.json", "w")
 f.write(json.dumps(generate_data(), indent=2))
 f.close()
