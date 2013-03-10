@@ -28,6 +28,8 @@ def generate_data():
     movables_key = "%s:%s" % (g_namespace(), 'movables')
     hostiles_key = "%s:%s" % (g_namespace(), 'hostiles')
 
+    mob_metadata = {}
+
     out_data = {}
     combined = {"loc": {}, "obj": {}, "mob": {}}
     for path in iter:
@@ -102,6 +104,7 @@ def generate_data():
     mobiles = combined["mob"]
     for mob_id, mob_data, in mobiles.iteritems():
         local_id, zone = mob_id.split('@')
+        mob_key = ":".join([zone, local_id])
 
         ns = lambda key: "%s:mob:%s:%s:%s" % (g_namespace(), zone, local_id, key)
 
@@ -117,10 +120,22 @@ def generate_data():
                     dest_value = ensure_zone(dest, zone)
 
                     room_key = ":".join([g_namespace(), "loc", dest_value, "mobs"])
-                    if room_key not in out_data:
-                        out_data[room_key] = []
-                    out_data[room_key].append(':'.join([zone, local_id]))
+                    add_to_value(out_data, room_key, mob_key)
                     out_data[ns("location")] = dest_value
+
+        # when are mobiles ...immobile:
+        #   In a room with NO exits (TODO)
+        #   In a room where every exit is any of the following:
+        #     1) a closed door (TODO)
+        #     2) a room with the NoMobiles flag (TODO)
+        #   Has no speed or speed is 0
+        if "speed" in mob_data:
+            if mob_data["speed"] > 0:
+                set_nested_value(mob_metadata, mob_key, "movable", 1)
+
+        if "aggression" in mob_data:
+            if mob_data["aggression"] > 0:
+                set_nested_value(mob_metadata, mob_key, "hostile", 1)
 
         for flags in ["eflags", "sflag", "sflags",
                     "pflag", "pflags", "mflag", "mflags"]:
@@ -129,6 +144,15 @@ def generate_data():
                 if flag_key.endswith("g"):
                     flag_key += "s"
                 out_data[ns("properties")][flag_key] = mob_data[prop]
+
+    # movables set
+    out_data[movables_key] = [ mk for mk, mv, in mob_metadata.iteritems()
+                               if "movable" in mv ]
+
+
+    # hostiles set
+    out_data[hostiles_key] = [ mk for mk, mv, in mob_metadata.iteritems()
+                               if "hostile" in mv ]
     return out_data
 
 def add_to_redis_sets(ns, out_data, loc_type, dest_value, val):
