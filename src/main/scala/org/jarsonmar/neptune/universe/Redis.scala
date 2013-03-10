@@ -3,7 +3,7 @@ package org.jarsonmar.neptune.universe
 import redis.clients.jedis._
 
 class Redis(host: String = "localhost", port: Int = 6379) {
-
+  import collection.JavaConversions._
   val client = new Jedis(host, port)
   lazy val key_namespace = "org.jarsonmar.neptune"
 
@@ -20,4 +20,20 @@ class Redis(host: String = "localhost", port: Int = 6379) {
   // set stuff
   def sadd(key: String, value: String) = client.sadd(key, value)
   def smove(src_key: String, dst_key: String, value: String) = client.smove(src_key, dst_key, value)
+  def smembers(key: String) = client.smembers(key)
+
+  private def locNS(key: String) = key_namespace + ":loc:" + key
+  private def objNS(key: String) = key_namespace + ":obj:" + key
+  private def mobNS(key: String) = key_namespace + ":mob:" + key
+  private def movablesNS         = key_namespace + ":movables"
+  private def hostilesNS         = key_namespace + ":hostiles"
+
+  private def mobPropKey(mob: String) = mobNS(mob) + ":properties"
+
+  // mobile related commands
+  def getFromMobile(key: String) = client.get(mobNS(key))
+  def smembersFromMobile(key: String) = client.smembers(mobNS(key))
+  def getMovables = asScalaSet(client.smembers(movablesNS))
+  def getMobileProperty(mob: String, prop: String) =
+    Option(client.hget(mobPropKey(mob), prop))
 }
