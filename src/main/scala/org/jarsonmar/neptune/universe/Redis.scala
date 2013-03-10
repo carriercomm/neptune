@@ -18,6 +18,6 @@ class Redis(host: String = "localhost", port: Int = 6379) {
   def hmget(key: String, fields: String*) = client.hmget(key, fields:_*)
 
   // set stuff
-  def sadd(key: String, value: String) = client.set(key, value)
-  def smove(key: String, value: String) = client.set(key, value)
+  def sadd(key: String, value: String) = client.sadd(key, value)
+  def smove(src_key: String, dst_key: String, value: String) = client.smove(src_key, dst_key, value)
 }
