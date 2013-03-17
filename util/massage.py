@@ -121,7 +121,7 @@ def generate_data():
 
                     room_key = ":".join([g_namespace(), "loc", dest_value, "mobs"])
                     add_to_value(out_data, room_key, mob_key)
-                    out_data[ns("location")] = dest_value
+                    out_data[ns("properties")]["location"] = dest_value
 
         # when are mobiles ...immobile:
         #   In a room with NO exits (TODO)
