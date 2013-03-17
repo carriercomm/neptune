@@ -10,7 +10,10 @@ object Controller extends App {
 object Universe extends App {
   val dispatcher = universe.Dispatcher()
   dispatcher.run(universe.Startup.Resume)
+}
 
+object RedisReload extends App {
+  universe.Builder().build
 }
 
 object TestThrift extends App {
