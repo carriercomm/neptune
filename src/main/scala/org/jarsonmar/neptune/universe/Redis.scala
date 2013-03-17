@@ -28,6 +28,9 @@ class Redis(host: String = "localhost", port: Int = 6379) {
   private def movablesNS         = key_namespace + ":movables"
   private def hostilesNS         = key_namespace + ":hostiles"
 
+  private def locExitsKey(loc: String) = locNS(loc) + ":exits"
+  private def locMobsKey(loc: String)  = locNS(loc) + ":mobs"
+
   private def mobPropKey(mob: String) = mobNS(mob) + ":properties"
 
   // mobile related commands
@@ -36,4 +39,15 @@ class Redis(host: String = "localhost", port: Int = 6379) {
   def getMovables = asScalaSet(client.smembers(movablesNS))
   def getMobileProperty(mob: String, prop: String) =
     Option(client.hget(mobPropKey(mob), prop))
+  def moveMobile(mob: String, src_loc: String, dst_loc: String) = {
+    client.smove(mob, locMobsKey(src_loc), locMobsKey(dst_loc))
+    client.hset(mobPropKey(mob), "location", dst_loc)
+  }
+
+  // location related commands
+  def getLocationExits(loc: String) = {
+    val exits = List("n", "s", "e", "w", "u", "d")
+    val dests = client.hmget(locExitsKey(loc), exits: _*) map { Option(_) }
+    (exits zip dests).toMap
+  }
 }
