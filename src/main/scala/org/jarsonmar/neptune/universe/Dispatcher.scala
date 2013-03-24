@@ -26,8 +26,9 @@ class NatureThrift {
     val redis: Redis = new Redis()
     val proc = new RequestProcessor(redis)
     val service_proc = new thrift.ControllerUpdateService.Processor(proc)
-
     try {
+    val transport: TTransport = new TSocket("localhost", 9090);
+    transport.open();
       val serverTransport: TServerTransport = new TServerSocket(9090);
       val server: TServer = new TSimpleServer(new TServer.Args(serverTransport).processor(service_proc));
 
@@ -48,6 +49,8 @@ case object NatureTick
 case class MoveMobile(mob_key: String, speed_ref: Double, start: Boolean = true)
 case class RandomTransfer(mob_key: String)
 case class TransferComplete(mob: String, src_loc: String, dst_loc: String)
+
+case class SendMobileMovement(mob: String, src_loc: String, dst_loc: String)
 
 object Nature {
   def tickMean = 2000.0
@@ -76,6 +79,41 @@ class RedisIO(redis: Redis) extends Actor {
   }
 }
 
+// uses thrift-dispatcher config
+class ThriftIO extends Actor {
+  import context.dispatcher
+
+  def receive = {
+    case SendMobileMovement(mob, src_loc, dst_loc) => {
+      var connected = false
+      val transport: TTransport = new TSocket("localhost", 9091);
+      try {
+        transport.open();
+        connected = true
+      }
+
+      if (connected) {
+        try {
+          val protocol: TProtocol = new TBinaryProtocol(transport);
+          val client: thrift.NatureUpdateService.Client = new thrift.NatureUpdateService.Client(protocol)
+
+          val mov     = new thrift.MobileMovement()
+          mov.mob     = mob
+          mov.locFrom = src_loc
+          mov.locTo   = dst_loc
+
+          println("Sending mobileMovement...")
+          val res = client.mobileMovement(mov)
+          println("Successful.")
+        }
+        catch {
+          case e: TException => e.printStackTrace()
+        }
+      }
+    }
+  }
+}
+
 // uses default-dispatcher config
 class Nature extends Actor {
   import context.dispatcher
@@ -95,8 +133,7 @@ class Nature extends Actor {
       )
     }
     case TransferComplete(mob, src_loc, dst_loc) => {
-      //TODO thrift dispatcher
-      //println("transfer: " + List(mob, src_loc, dst_loc).toString)
+      context.actorFor("/user/thrift_io") ! SendMobileMovement(mob, src_loc, dst_loc)
     }
   }
 }
@@ -110,6 +147,10 @@ class NatureThread extends Runnable {
     val redis: Redis = new Redis()
 
     val nature_ref = system.actorOf(Props[Nature], "nature")
+    val thrift_io_ref = system.actorOf(
+      Props[ThriftIO].withDispatcher("akka.actor.thrift-dispatcher"),
+        "thrift_io"
+      )
     val redis_io_ref = system.actorOf(
       Props(new RedisIO(redis)).withDispatcher("akka.actor.redis-dispatcher"),
       "redis_io"
@@ -150,7 +191,7 @@ object SendRequestToThrift {
 
     try {
       val protocol: TProtocol = new TBinaryProtocol(transport);
-      val client: thrift.LocRequestService.Client = new thrift.LocRequestService.Client(protocol)
+      val client: thrift.ControllerUpdateService.Client = new thrift.ControllerUpdateService.Client(protocol)
 
       val req: thrift.LocReadRequest = new thrift.LocReadRequest()
       val myid = "start:church"

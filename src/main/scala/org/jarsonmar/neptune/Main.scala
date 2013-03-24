@@ -3,6 +3,8 @@ package org.jarsonmar.neptune
 import akka.actor._
 
 object Controller extends App {
+  val thrift_thread = new Thread(new controller.ControllerThrift())
+  thrift_thread.start
   val system = ActorSystem("NeptuneController")
   val server = system.actorOf(Props[controller.Dispatcher])
 }

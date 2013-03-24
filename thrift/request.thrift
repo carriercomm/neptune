@@ -38,6 +38,17 @@ struct LocReadResponse {
     1: map<string, LocReadInstance> locs,
 }
 
+struct MobileMovement {
+    1: string mob,
+    2: string locFrom,
+    3: string locTo,
+    4: ExitProp direction,
+}
+
 service ControllerUpdateService {
     LocReadResponse readRequest(1: LocReadRequest req),
+}
+
+service NatureUpdateService {
+    bool mobileMovement(1: MobileMovement req),
 }

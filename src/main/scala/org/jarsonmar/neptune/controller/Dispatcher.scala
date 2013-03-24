@@ -4,6 +4,13 @@ import akka.util._
 
 import collection.mutable
 
+import org.apache.thrift.TException
+import org.apache.thrift.server._
+import org.apache.thrift.transport._
+import org.apache.thrift.protocol._
+
+import org.jarsonmar.neptune.thrift
+
 class Dispatcher extends Actor {
   private lazy val lineFeed = ByteString(0x0a)
 
@@ -40,6 +47,24 @@ class Dispatcher extends Actor {
           socket.write(response ++ ByteString("\n> "))
         }
       }
+    }
+  }
+}
+
+class ControllerThrift extends Runnable {
+  def run() = {
+    println("[controller] Starting thrift server")
+    val proc = new NatureUpdateProcessor()
+    val service_proc = new thrift.NatureUpdateService.Processor(proc)
+
+    try {
+      val serverTransport: TServerTransport = new TServerSocket(9091);
+      val server: TServer = new TSimpleServer(new TServer.Args(serverTransport).processor(service_proc));
+
+      server.serve()
+    }
+    catch {
+      case e: Exception => e.printStackTrace();
     }
   }
 }
