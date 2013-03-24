@@ -38,6 +38,6 @@ struct LocReadResponse {
     1: map<string, LocReadInstance> locs,
 }
 
-service LocRequestService {
+service ControllerUpdateService {
     LocReadResponse readRequest(1: LocReadRequest req),
 }

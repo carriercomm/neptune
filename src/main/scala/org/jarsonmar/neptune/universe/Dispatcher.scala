@@ -21,11 +21,11 @@ object Startup {
   case object Resume extends Build // start without rebuilding redis cache
 }
 
-class ThriftListener {
+class NatureThrift {
   def run(build_type: Startup.Build) = {
     val redis: Redis = new Redis()
     val proc = new RequestProcessor(redis)
-    val service_proc = new thrift.LocRequestService.Processor(proc)
+    val service_proc = new thrift.ControllerUpdateService.Processor(proc)
 
     try {
       val serverTransport: TServerTransport = new TServerSocket(9090);
@@ -36,7 +36,7 @@ class ThriftListener {
         case Startup.Resume => /* just start without building */
       }
 
-      server.serve();
+      server.serve()
     }
     catch {
       case e: Exception => e.printStackTrace();
@@ -131,10 +131,10 @@ class NatureThread extends Runnable {
 class Dispatcher {
   def run(build_type: Startup.Build) = {
     val nature = new Thread(new NatureThread())
-    val thrift_listener = new ThriftListener()
+    val nature_thrift = new NatureThrift()
 
     nature.start() // thread in the background
-    thrift_listener.run(Startup.Resume)
+    nature_thrift.run(Startup.Resume)
   }
 }
 

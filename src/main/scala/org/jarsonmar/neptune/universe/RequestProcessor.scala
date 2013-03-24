@@ -4,7 +4,7 @@ import org.jarsonmar.neptune.thrift
 import collection.mutable
 
 
-class RequestProcessor(redis: Redis) extends thrift.LocRequestService.Iface {
+class RequestProcessor(redis: Redis) extends thrift.ControllerUpdateService.Iface {
 
   lazy final val exit_prop_to_key: Map[thrift.ExitProp, String] = Map(
     thrift.ExitProp.NORTH -> "n",
